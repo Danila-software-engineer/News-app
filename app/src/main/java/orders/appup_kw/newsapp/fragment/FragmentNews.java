@@ -24,19 +24,22 @@ import orders.appup_kw.newsapp.R;
 
 import orders.appup_kw.newsapp.activity.MainActivity;
 import orders.appup_kw.newsapp.adaper.NewsAdapter;
+import orders.appup_kw.newsapp.contract.NewsContract;
 import orders.appup_kw.newsapp.model.NewsPOJO;
 import orders.appup_kw.newsapp.network.NetworkService;
+import orders.appup_kw.newsapp.presenter.NewsPresenter;
 
-public class FragmentNews extends BaseFragment{
+public class FragmentNews extends BaseFragment implements NewsContract {
 
     @BindView(R.id.myRecyclerView)
     RecyclerView myRecyclerView;
     Unbinder unbinder;
     NewsAdapter newsAdapter;
+    List<NewsPOJO.Result> newsStrings = new ArrayList<>();
+    private Listener clickListener;
 
-    private GreenListener clickListener;
+    NewsPresenter newsPresenter;
 
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static FragmentNews newInstance() {
         FragmentNews fragment = new FragmentNews();
@@ -45,13 +48,10 @@ public class FragmentNews extends BaseFragment{
 
     @Override
     public void onAttach(Context context) {
-
-
         if (context instanceof MainActivity){
             MainActivity mainActivity = (MainActivity) context;
             clickListener = mainActivity;
         }
-
         super.onAttach(context);
     }
 
@@ -63,57 +63,39 @@ public class FragmentNews extends BaseFragment{
         updateActivityTitle(getString(R.string.news));
 
 
-
-        List<NewsPOJO.Result> newsStrings = new ArrayList<>();
-
-
-
-
-        compositeDisposable.add(
-                getNews()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(newsPOJO ->{
-                            newsStrings.addAll(newsPOJO.getResults());
-                            newsAdapter.notifyDataSetChanged();
-                        })
-                        .subscribe());
-
-
-
-
         newsAdapter = new NewsAdapter(getContext(), newsStrings);
-
         myRecyclerView.setAdapter(newsAdapter);
 
-       Disposable disposable =  newsAdapter.getPublishSubject().subscribe(integer -> {
-           if (clickListener != null){
-               clickListener.oneGreenClickButton(integer);
-           }
-        });
-        compositeDisposable.add(disposable);
+        newsPresenter = new NewsPresenter(this);
+        newsPresenter.loadDataFromNetwork();
+        newsPresenter.chosenItem(newsAdapter.getPublishSubject());
 
         return view;
     }
 
-    private Observable<NewsPOJO> getNews(){
-        return NetworkService.getInstance()
-                .getJSONApi()
-                .getNews();
+    @Override
+    public void setData(NewsPOJO newsPOJO) {
+        newsStrings.addAll(newsPOJO.getResults());
+        newsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void openNewFragment(int i) {
+        if (clickListener != null){
+            clickListener.oneClickButton(i);
+        }
     }
 
 
-    public interface GreenListener{
-        void oneGreenClickButton(int id);
+    public interface Listener{
+        void oneClickButton(int id);
     }
 
 
     @Override
     public void onDestroy() {
-
-        compositeDisposable.dispose();
+        newsPresenter.destroy();
         super.onDestroy();
-
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,7 +21,7 @@ import orders.appup_kw.newsapp.fragment.FragmentPlaces;
 import orders.appup_kw.newsapp.fragment.InfoFragment;
 import orders.appup_kw.newsapp.fragment.NewFragment;
 
-public class MainActivity extends BaseActivity implements FragmentNews.GreenListener {
+public class MainActivity extends BaseActivity implements FragmentNews.Listener {
 
     @BindView(R.id.navigationView)
     NavigationView navigationView;
@@ -36,7 +37,7 @@ public class MainActivity extends BaseActivity implements FragmentNews.GreenList
 
 
     @Override
-    public void oneGreenClickButton(int id) {
+    public void oneClickButton(int id) {
         launchFragment(NewFragment.newInstance(id));
     }
 
@@ -94,11 +95,11 @@ public class MainActivity extends BaseActivity implements FragmentNews.GreenList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (drawerLayout.isDrawerOpen(Gravity.START)) {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawers();
                 }
                 else {
-                    drawerLayout.openDrawer(Gravity.START);
+                    drawerLayout.openDrawer(GravityCompat.START);
                 }
                 return true;
             default:
