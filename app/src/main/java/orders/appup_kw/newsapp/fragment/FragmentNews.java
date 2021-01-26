@@ -2,11 +2,11 @@ package orders.appup_kw.newsapp.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -15,18 +15,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import orders.appup_kw.newsapp.R;
 
 import orders.appup_kw.newsapp.activity.MainActivity;
 import orders.appup_kw.newsapp.adaper.NewsAdapter;
 import orders.appup_kw.newsapp.contract.NewsContract;
 import orders.appup_kw.newsapp.model.NewsPOJO;
-import orders.appup_kw.newsapp.network.NetworkService;
 import orders.appup_kw.newsapp.presenter.NewsPresenter;
 
 public class FragmentNews extends BaseFragment implements NewsContract {
@@ -42,15 +36,13 @@ public class FragmentNews extends BaseFragment implements NewsContract {
 
 
     public static FragmentNews newInstance() {
-        FragmentNews fragment = new FragmentNews();
-        return fragment;
+        return new FragmentNews();
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         if (context instanceof MainActivity){
-            MainActivity mainActivity = (MainActivity) context;
-            clickListener = mainActivity;
+            clickListener = (MainActivity) context;
         }
         super.onAttach(context);
     }
@@ -75,6 +67,7 @@ public class FragmentNews extends BaseFragment implements NewsContract {
 
     @Override
     public void setData(NewsPOJO newsPOJO) {
+        newsStrings.clear();
         newsStrings.addAll(newsPOJO.getResults());
         newsAdapter.notifyDataSetChanged();
     }

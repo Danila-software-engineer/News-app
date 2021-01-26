@@ -1,32 +1,23 @@
 package orders.appup_kw.newsapp.fragment;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,10 +26,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
 import orders.appup_kw.newsapp.model.NewPOJO;
-import orders.appup_kw.newsapp.network.NetworkService;
+import orders.appup_kw.newsapp.network.Api;
 
 public class NewFragment extends BaseFragment {
 
@@ -58,6 +50,8 @@ public class NewFragment extends BaseFragment {
     Unbinder unbinder;
     CompositeDisposable compositeDisposable = new CompositeDisposable();
 
+    @Inject
+    Api api;
 
     private FragmentActivity myContext;
 
@@ -85,9 +79,7 @@ public class NewFragment extends BaseFragment {
 
     private Observable<NewPOJO> getNew(){
 
-        return NetworkService.getInstance()
-                .getJSONApi()
-                .getNew(id);
+        return api.getNew(id);
     }
 
 
@@ -96,6 +88,9 @@ public class NewFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_new, container, false);
         unbinder = ButterKnife.bind(this, view);
+
+        App.getAppComponent().inject(this);
+
         updateActivityTitle(getString(R.string.news));
 
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
