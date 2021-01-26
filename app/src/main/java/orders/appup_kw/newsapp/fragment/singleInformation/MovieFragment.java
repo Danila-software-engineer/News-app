@@ -1,10 +1,14 @@
-package orders.appup_kw.newsapp.fragment;
+package orders.appup_kw.newsapp.fragment.singleInformation;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
@@ -12,6 +16,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -29,20 +34,27 @@ import io.reactivex.schedulers.Schedulers;
 import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
+import orders.appup_kw.newsapp.model.MoviePOJO;
 import orders.appup_kw.newsapp.model.NewPOJO;
 import orders.appup_kw.newsapp.network.Api;
 
-public class NewFragment extends BaseFragment {
+
+public class MovieFragment extends Fragment {
+
+    //_movie
 
     private int id = 0;
-    @BindView(R.id.news_text1)
+    @BindView(R.id.news_text1_movie)
     TextView textViewTitle;
-    @BindView(R.id.newsText1)
+    @BindView(R.id.newsText1_movie)
     TextView newsText;
-    @BindView(R.id.textView4)
+    @BindView(R.id.textView4_movie)
     TextView countPosition;
 
-    @BindView(R.id.viewPager)
+    @BindView(R.id.trailer)
+    Button trailer;
+
+    @BindView(R.id.viewPager_movie)
     ViewPager viewPager;
 
     List<String> imageList = new ArrayList<>();
@@ -57,19 +69,20 @@ public class NewFragment extends BaseFragment {
 
     @Override
     public void onAttach(Context activity) {
-        myContext=(FragmentActivity) activity;
+        myContext = (FragmentActivity) activity;
         super.onAttach(activity);
     }
 
 
-    public static NewFragment newInstance(int id) {
+    public static MovieFragment newInstance(int id) {
         Bundle map = new Bundle();
         map.putInt("id", id);
-        NewFragment fragment = new NewFragment();
+        MovieFragment fragment = new MovieFragment();
         fragment.setArguments(map);
         return fragment;
 
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,42 +90,42 @@ public class NewFragment extends BaseFragment {
         id = getArguments().getInt("id");
     }
 
-    private Observable<NewPOJO> getNew(){
+    private Observable<MoviePOJO> getMovie(){
 
-        return api.getNew(id);
+        return api.getMovie(id);
     }
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_new, container, false);
+        View view = inflater.inflate(R.layout.fragment_movie, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         App.getAppComponent().inject(this);
 
-        updateActivityTitle(getString(R.string.news));
+
 
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
         viewPager.setAdapter(viewPagerAdapter);
 
 
 
-
         compositeDisposable.add(
-                getNew()
+                getMovie()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnNext(this::setLayoutInformation)
                         .subscribe());
 
 
+
         return view;
     }
 
-    private void setLayoutInformation(NewPOJO newPOJO){
+    private void setLayoutInformation(MoviePOJO moviePOJO){
 
-        countPosition.setText("1/" + newPOJO.getImages().size());
+        countPosition.setText("1/" + moviePOJO.getImages().size());
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -121,7 +134,7 @@ public class NewFragment extends BaseFragment {
 
             @Override
             public void onPageSelected(int i) {
-                countPosition.setText((i + 1) + "/" + newPOJO.getImages().size());
+                countPosition.setText((i + 1) + "/" + moviePOJO.getImages().size());
             }
 
             @Override
@@ -129,12 +142,24 @@ public class NewFragment extends BaseFragment {
             }
         });
 
-        textViewTitle.setText(newPOJO.getTitle());
-        newsText.setText(Html.fromHtml(newPOJO.getBodyText()));
+        textViewTitle.setText(moviePOJO.getTitle());
+        newsText.setText(Html.fromHtml(moviePOJO.getBodyText()));
+
+
+        trailer.setOnClickListener(v -> {
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(moviePOJO.getTrailer()));
+            Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(moviePOJO.getTrailer()));
+            try {
+                this.startActivity(appIntent);
+            } catch (ActivityNotFoundException ex) {
+                this.startActivity(webIntent);
+            }
+        });
 
 
         imageList.clear();
-        for (NewPOJO.Image imageLink: newPOJO.getImages()) {
+        for (MoviePOJO.Image imageLink: moviePOJO.getImages()) {
             imageList.add(imageLink.getImage());
         }
         viewPagerAdapter.notifyDataSetChanged();
@@ -145,12 +170,12 @@ public class NewFragment extends BaseFragment {
     public void onDestroy() {
 
         compositeDisposable.dispose();
-
         super.onDestroy();
     }
 
     @Override
     public void onDestroyView() {
+
         unbinder.unbind();
         super.onDestroyView();
     }

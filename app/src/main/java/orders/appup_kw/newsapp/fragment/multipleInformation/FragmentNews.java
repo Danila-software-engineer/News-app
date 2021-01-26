@@ -1,4 +1,4 @@
-package orders.appup_kw.newsapp.fragment;
+package orders.appup_kw.newsapp.fragment.multipleInformation;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.activity.MainActivity;
 import orders.appup_kw.newsapp.adaper.NewsAdapter;
 import orders.appup_kw.newsapp.contract.NewsContract;
+import orders.appup_kw.newsapp.fragment.BaseFragment;
 import orders.appup_kw.newsapp.model.NewsPOJO;
 import orders.appup_kw.newsapp.presenter.NewsPresenter;
 

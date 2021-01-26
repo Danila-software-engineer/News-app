@@ -49,8 +49,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Log.e("TAGG", "text - " + position);
-        final NewsPOJO.Result result = data.get(position);
+        NewsPOJO.Result result = data.get(position);
         holder.textViewNews.setText(result.getTitle());
+
         try {
             Glide.with(context)
                     .load(data.get(position).getImages().get(0).getImage())
@@ -73,6 +74,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
             e.printStackTrace();
 
         }
+
         holder.itemView.setOnClickListener(v -> {
             publishSubject.onNext(result.getId());
         });

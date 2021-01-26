@@ -10,6 +10,7 @@ import dagger.Provides;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import orders.appup_kw.newsapp.network.Api;
+import orders.appup_kw.newsapp.use_case.MoviesUseCase;
 import orders.appup_kw.newsapp.use_case.NewsUseCase;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -54,5 +55,11 @@ public class NetworkModule {
     @Singleton
     public NewsUseCase provideNewsUseCase(){
         return new NewsUseCase();
+    }
+
+    @Provides
+    @Singleton
+    public MoviesUseCase provideMoviesUseCase(){
+        return new MoviesUseCase();
     }
 }

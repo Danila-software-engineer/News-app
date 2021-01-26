@@ -1,7 +1,6 @@
 package orders.appup_kw.newsapp.activity;
 
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -15,13 +14,14 @@ import com.google.android.material.navigation.NavigationView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import orders.appup_kw.newsapp.R;
-import orders.appup_kw.newsapp.fragment.FragmentMovies;
-import orders.appup_kw.newsapp.fragment.FragmentNews;
-import orders.appup_kw.newsapp.fragment.FragmentPlaces;
+import orders.appup_kw.newsapp.fragment.multipleInformation.FragmentMovies;
+import orders.appup_kw.newsapp.fragment.multipleInformation.FragmentNews;
+import orders.appup_kw.newsapp.fragment.multipleInformation.FragmentPlaces;
 import orders.appup_kw.newsapp.fragment.InfoFragment;
-import orders.appup_kw.newsapp.fragment.NewFragment;
+import orders.appup_kw.newsapp.fragment.singleInformation.MovieFragment;
+import orders.appup_kw.newsapp.fragment.singleInformation.NewFragment;
 
-public class MainActivity extends BaseActivity implements FragmentNews.Listener {
+public class MainActivity extends BaseActivity implements FragmentNews.Listener, FragmentMovies.ListenerMovies {
 
     @BindView(R.id.navigationView)
     NavigationView navigationView;
@@ -39,6 +39,11 @@ public class MainActivity extends BaseActivity implements FragmentNews.Listener 
     @Override
     public void oneClickButton(int id) {
         launchFragment(NewFragment.newInstance(id));
+    }
+
+    @Override
+    public void oneClickButtonMovies(int id) {
+        launchFragment(MovieFragment.newInstance(id));
     }
 
     @Override
@@ -106,6 +111,7 @@ public class MainActivity extends BaseActivity implements FragmentNews.Listener 
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
 
 }
