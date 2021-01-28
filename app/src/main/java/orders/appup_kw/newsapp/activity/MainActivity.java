@@ -20,8 +20,9 @@ import orders.appup_kw.newsapp.fragment.multipleInformation.FragmentPlaces;
 import orders.appup_kw.newsapp.fragment.InfoFragment;
 import orders.appup_kw.newsapp.fragment.singleInformation.MovieFragment;
 import orders.appup_kw.newsapp.fragment.singleInformation.NewFragment;
+import orders.appup_kw.newsapp.fragment.singleInformation.PlaceFragment;
 
-public class MainActivity extends BaseActivity implements FragmentNews.Listener, FragmentMovies.ListenerMovies {
+public class MainActivity extends BaseActivity implements FragmentNews.Listener, FragmentMovies.ListenerMovies,FragmentPlaces.ListenerPlaces {
 
     @BindView(R.id.navigationView)
     NavigationView navigationView;
@@ -44,6 +45,11 @@ public class MainActivity extends BaseActivity implements FragmentNews.Listener,
     @Override
     public void oneClickButtonMovies(int id) {
         launchFragment(MovieFragment.newInstance(id));
+    }
+
+    @Override
+    public void oneClickButtonPlaces(int id) {
+        launchFragment(PlaceFragment.newInstance(id));
     }
 
     @Override

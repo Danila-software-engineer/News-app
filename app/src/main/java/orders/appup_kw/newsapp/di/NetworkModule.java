@@ -12,6 +12,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import orders.appup_kw.newsapp.network.Api;
 import orders.appup_kw.newsapp.use_case.MoviesUseCase;
 import orders.appup_kw.newsapp.use_case.NewsUseCase;
+import orders.appup_kw.newsapp.use_case.PlacesUseCase;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -61,5 +62,11 @@ public class NetworkModule {
     @Singleton
     public MoviesUseCase provideMoviesUseCase(){
         return new MoviesUseCase();
+    }
+
+    @Provides
+    @Singleton
+    public PlacesUseCase providePlacesUseCase(){
+        return new PlacesUseCase();
     }
 }

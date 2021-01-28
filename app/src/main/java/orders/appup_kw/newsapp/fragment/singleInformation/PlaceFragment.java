@@ -1,22 +1,17 @@
 package orders.appup_kw.newsapp.fragment.singleInformation;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,37 +30,32 @@ import io.reactivex.schedulers.Schedulers;
 import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
-import orders.appup_kw.newsapp.model.MoviePOJO;
 import orders.appup_kw.newsapp.model.NewPOJO;
+import orders.appup_kw.newsapp.model.PlacePOJO;
 import orders.appup_kw.newsapp.network.Api;
 
 
-public class MovieFragment extends Fragment {
+public class PlaceFragment extends Fragment {
 
-    //_movie
-
-    private int id = 0;
-    @BindView(R.id.news_text1_movie)
+    @BindView(R.id.news_text1_places)
     TextView textViewTitle;
-    @BindView(R.id.newsText1_movie)
+    @BindView(R.id.newsText1_places)
     TextView newsText;
-    @BindView(R.id.textView4_movie)
+    @BindView(R.id.textView4_places)
     TextView countPosition;
 
-    @BindView(R.id.trailer)
-    Button trailer;
-
-    @BindView(R.id.viewPager_movie)
+    @BindView(R.id.viewPager_places)
     ViewPager viewPager;
+
+    @Inject
+    Api api;
 
     List<String> imageList = new ArrayList<>();
     ViewPagerAdapter viewPagerAdapter;
     Unbinder unbinder;
     CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    @Inject
-    Api api;
-
+    private int id = 0;
     private FragmentActivity myContext;
 
     @Override
@@ -75,15 +65,14 @@ public class MovieFragment extends Fragment {
     }
 
 
-    public static MovieFragment newInstance(int id) {
+    public static PlaceFragment newInstance(int id) {
         Bundle map = new Bundle();
         map.putInt("id", id);
-        MovieFragment fragment = new MovieFragment();
+        PlaceFragment fragment = new PlaceFragment();
         fragment.setArguments(map);
         return fragment;
 
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,16 +80,16 @@ public class MovieFragment extends Fragment {
         id = getArguments().getInt("id");
     }
 
-    private Observable<MoviePOJO> getMovie(){
+    private Observable<PlacePOJO> getPlace(){
 
-        return api.getMovie(id);
+        return api.getPlace(id);
     }
 
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_movie, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_place, container, false);
+
         unbinder = ButterKnife.bind(this, view);
 
         App.getAppComponent().inject(this);
@@ -113,22 +102,23 @@ public class MovieFragment extends Fragment {
 
 
         compositeDisposable.add(
-                getMovie()
+                getPlace()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::setLayoutInformation, throwable -> {
                             throwable.printStackTrace();
+                            Log.e("TAGG_place","Error! id =" + id);//1734
                             Toast.makeText(getActivity(),"Error! id =" + id, Toast.LENGTH_SHORT).show();
                         }));
-
 
 
         return view;
     }
 
-    private void setLayoutInformation(MoviePOJO moviePOJO){
 
-        countPosition.setText("1/" + moviePOJO.getImages().size());
+    private void setLayoutInformation(PlacePOJO placePOJO){
+
+        countPosition.setText("1/" + placePOJO.getImages().size());
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -137,7 +127,7 @@ public class MovieFragment extends Fragment {
 
             @Override
             public void onPageSelected(int i) {
-                countPosition.setText((i + 1) + "/" + moviePOJO.getImages().size());
+                countPosition.setText((i + 1) + "/" + placePOJO.getImages().size());
             }
 
             @Override
@@ -145,24 +135,12 @@ public class MovieFragment extends Fragment {
             }
         });
 
-        textViewTitle.setText(moviePOJO.getTitle());
-        newsText.setText(Html.fromHtml(moviePOJO.getBodyText()));
-
-
-        trailer.setOnClickListener(v -> {
-            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(moviePOJO.getTrailer()));
-            Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(moviePOJO.getTrailer()));
-            try {
-                this.startActivity(appIntent);
-            } catch (ActivityNotFoundException ex) {
-                this.startActivity(webIntent);
-            }
-        });
+        textViewTitle.setText(placePOJO.getTitle());
+        newsText.setText(Html.fromHtml(placePOJO.getBodyText()));
 
 
         imageList.clear();
-        for (MoviePOJO.Image imageLink: moviePOJO.getImages()) {
+        for (PlacePOJO.Image imageLink: placePOJO.getImages()) {
             imageList.add(imageLink.getImage());
         }
         viewPagerAdapter.notifyDataSetChanged();
@@ -173,12 +151,12 @@ public class MovieFragment extends Fragment {
     public void onDestroy() {
 
         compositeDisposable.dispose();
+
         super.onDestroy();
     }
 
     @Override
     public void onDestroyView() {
-
         unbinder.unbind();
         super.onDestroyView();
     }

@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,8 +104,10 @@ public class NewFragment extends BaseFragment {
                 getNew()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(this::setLayoutInformation)
-                        .subscribe());
+                        .subscribe(this::setLayoutInformation, throwable -> {
+                            throwable.printStackTrace();
+                            Toast.makeText(getActivity(),"Error! id =" + id, Toast.LENGTH_SHORT).show();
+                        }));
 
 
         return view;

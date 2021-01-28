@@ -1,6 +1,8 @@
 package orders.appup_kw.newsapp.presenter;
 
 
+import android.util.Log;
+
 import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -40,8 +42,9 @@ public class MoviesPresenter {
     public void loadDataFromNetwork(){
         compositeDisposable.add(
                 moviesUseCase.loadData()
-                        .doOnNext(this::setData)
-                        .subscribe()
+                        .subscribe(this::setData, throwable -> {
+                            Log.e("TAGG_Movies", "Ошибка");
+                        })
         );
     }
 

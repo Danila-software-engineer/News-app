@@ -9,39 +9,38 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.contract.NewsContract;
+import orders.appup_kw.newsapp.contract.PlacesContract;
 import orders.appup_kw.newsapp.model.NewsPOJO;
+import orders.appup_kw.newsapp.model.PlacesPOJO;
 import orders.appup_kw.newsapp.use_case.NewsUseCase;
+import orders.appup_kw.newsapp.use_case.PlacesUseCase;
 
-public class NewsPresenter {
+public class PlacesPresenter {
 
-    NewsContract newsContract;
+    PlacesContract placesContract;
 
     @Inject
-    NewsUseCase newsUseCase;
+    PlacesUseCase placesUseCase;
 
-    public NewsPresenter(NewsContract newsContract) {
-        this.newsContract = newsContract;
+    public PlacesPresenter(PlacesContract placesContract) {
+        this.placesContract = placesContract;
         App.getAppComponent().inject(this);
     }
 
     CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public void chosenItem(PublishSubject<Integer> publishSubject){
-        Disposable disposable =  publishSubject.subscribe(integer -> {
-            newsContract.openNewFragment(integer);
-        });
-        compositeDisposable.add(disposable);
-    }
 
-    private void setData(NewsPOJO newsPOJO){
-        newsContract.setData(newsPOJO);
+
+    private void setData(PlacesPOJO placesPOJO){
+        placesContract.setData(placesPOJO);
     }
 
     public void loadDataFromNetwork(){
         compositeDisposable.add(
-                newsUseCase.loadData()
+                placesUseCase.loadData()
                         .subscribe(this::setData, throwable -> {
-                            Log.e("TAGG_News", "Ошибка");
+                            Log.e("TAGG_Place", "Ошибка");
+                            throwable.printStackTrace();
                         })
         );
     }
