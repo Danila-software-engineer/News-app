@@ -9,6 +9,9 @@ import orders.appup_kw.newsapp.fragment.singleInformation.PlaceFragment;
 import orders.appup_kw.newsapp.presenter.MoviesPresenter;
 import orders.appup_kw.newsapp.presenter.NewsPresenter;
 import orders.appup_kw.newsapp.presenter.PlacesPresenter;
+import orders.appup_kw.newsapp.presenter.single_presenter.MoviePresenter;
+import orders.appup_kw.newsapp.presenter.single_presenter.NewPresenter;
+import orders.appup_kw.newsapp.presenter.single_presenter.PlacePresenter;
 import orders.appup_kw.newsapp.use_case.MoviesUseCase;
 import orders.appup_kw.newsapp.use_case.NewsUseCase;
 import orders.appup_kw.newsapp.use_case.PlacesUseCase;
@@ -26,4 +29,8 @@ public interface AppComponent {
     void inject(PlacesPresenter placesPresenter);
     void inject(PlacesUseCase placesUseCase);
     void inject(PlaceFragment placeFragment);
+
+    void inject(MoviePresenter moviePresenter);
+    void inject(NewPresenter newPresenter);
+    void inject(PlacePresenter placePresenter);
 }

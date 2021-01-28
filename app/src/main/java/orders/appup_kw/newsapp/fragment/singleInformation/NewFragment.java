@@ -30,11 +30,13 @@ import io.reactivex.schedulers.Schedulers;
 import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
+import orders.appup_kw.newsapp.contract.single_contract.NewContract;
 import orders.appup_kw.newsapp.fragment.BaseFragment;
 import orders.appup_kw.newsapp.model.NewPOJO;
 import orders.appup_kw.newsapp.network.Api;
+import orders.appup_kw.newsapp.presenter.single_presenter.NewPresenter;
 
-public class NewFragment extends BaseFragment {
+public class NewFragment extends BaseFragment implements NewContract {
 
     private int id = 0;
     @BindView(R.id.news_text1)
@@ -50,10 +52,9 @@ public class NewFragment extends BaseFragment {
     List<String> imageList = new ArrayList<>();
     ViewPagerAdapter viewPagerAdapter;
     Unbinder unbinder;
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    @Inject
-    Api api;
+    NewPresenter newPresenter;
+
 
     private FragmentActivity myContext;
 
@@ -70,7 +71,6 @@ public class NewFragment extends BaseFragment {
         NewFragment fragment = new NewFragment();
         fragment.setArguments(map);
         return fragment;
-
     }
 
     @Override
@@ -79,11 +79,12 @@ public class NewFragment extends BaseFragment {
         id = getArguments().getInt("id");
     }
 
-    private Observable<NewPOJO> getNew(){
 
-        return api.getNew(id);
+
+    @Override
+    public void setData(NewPOJO newPOJO) {
+        setLayoutInformation(newPOJO);
     }
-
 
     @Nullable
     @Override
@@ -92,23 +93,13 @@ public class NewFragment extends BaseFragment {
         unbinder = ButterKnife.bind(this, view);
 
         App.getAppComponent().inject(this);
-
         updateActivityTitle(getString(R.string.news));
 
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
         viewPager.setAdapter(viewPagerAdapter);
 
-
-
-        compositeDisposable.add(
-                getNew()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::setLayoutInformation, throwable -> {
-                            throwable.printStackTrace();
-                            Toast.makeText(getActivity(),"Error! id =" + id, Toast.LENGTH_SHORT).show();
-                        }));
-
+        newPresenter = new NewPresenter(this);
+        newPresenter.loadData(id);
 
         return view;
     }
@@ -146,9 +137,7 @@ public class NewFragment extends BaseFragment {
 
     @Override
     public void onDestroy() {
-
-        compositeDisposable.dispose();
-
+        newPresenter.destroy();
         super.onDestroy();
     }
 
@@ -157,4 +146,6 @@ public class NewFragment extends BaseFragment {
         unbinder.unbind();
         super.onDestroyView();
     }
+
+
 }

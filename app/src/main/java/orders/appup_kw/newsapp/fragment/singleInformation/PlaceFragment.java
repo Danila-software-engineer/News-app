@@ -2,40 +2,28 @@ package orders.appup_kw.newsapp.fragment.singleInformation;
 
 import android.content.Context;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
-
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
-import orders.appup_kw.newsapp.model.NewPOJO;
+import orders.appup_kw.newsapp.contract.single_contract.PlaceContract;
 import orders.appup_kw.newsapp.model.PlacePOJO;
-import orders.appup_kw.newsapp.network.Api;
+import orders.appup_kw.newsapp.presenter.single_presenter.PlacePresenter;
 
 
-public class PlaceFragment extends Fragment {
+public class PlaceFragment extends Fragment implements PlaceContract {
 
     @BindView(R.id.news_text1_places)
     TextView textViewTitle;
@@ -47,16 +35,15 @@ public class PlaceFragment extends Fragment {
     @BindView(R.id.viewPager_places)
     ViewPager viewPager;
 
-    @Inject
-    Api api;
 
     List<String> imageList = new ArrayList<>();
     ViewPagerAdapter viewPagerAdapter;
     Unbinder unbinder;
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private int id = 0;
     private FragmentActivity myContext;
+
+    PlacePresenter placePresenter;
 
     @Override
     public void onAttach(Context activity) {
@@ -71,7 +58,6 @@ public class PlaceFragment extends Fragment {
         PlaceFragment fragment = new PlaceFragment();
         fragment.setArguments(map);
         return fragment;
-
     }
 
     @Override
@@ -80,41 +66,28 @@ public class PlaceFragment extends Fragment {
         id = getArguments().getInt("id");
     }
 
-    private Observable<PlacePOJO> getPlace(){
 
-        return api.getPlace(id);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_place, container, false);
-
         unbinder = ButterKnife.bind(this, view);
-
         App.getAppComponent().inject(this);
-
-
 
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
         viewPager.setAdapter(viewPagerAdapter);
 
-
-
-        compositeDisposable.add(
-                getPlace()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::setLayoutInformation, throwable -> {
-                            throwable.printStackTrace();
-                            Log.e("TAGG_place","Error! id =" + id);//1734
-                            Toast.makeText(getActivity(),"Error! id =" + id, Toast.LENGTH_SHORT).show();
-                        }));
-
+        placePresenter = new PlacePresenter(this);
+        placePresenter.loadData(id);
 
         return view;
     }
 
+    @Override
+    public void setData(PlacePOJO placePOJO) {
+        setLayoutInformation(placePOJO);
+    }
 
     private void setLayoutInformation(PlacePOJO placePOJO){
 
@@ -149,9 +122,7 @@ public class PlaceFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-
-        compositeDisposable.dispose();
-
+        placePresenter.destroy();
         super.onDestroy();
     }
 
@@ -160,4 +131,6 @@ public class PlaceFragment extends Fragment {
         unbinder.unbind();
         super.onDestroyView();
     }
+
+
 }

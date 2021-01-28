@@ -35,14 +35,15 @@ import io.reactivex.schedulers.Schedulers;
 import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
+import orders.appup_kw.newsapp.contract.MoviesContract;
+import orders.appup_kw.newsapp.contract.single_contract.MovieContract;
 import orders.appup_kw.newsapp.model.MoviePOJO;
 import orders.appup_kw.newsapp.model.NewPOJO;
 import orders.appup_kw.newsapp.network.Api;
+import orders.appup_kw.newsapp.presenter.single_presenter.MoviePresenter;
 
 
-public class MovieFragment extends Fragment {
-
-    //_movie
+public class MovieFragment extends Fragment implements MovieContract {
 
     private int id = 0;
     @BindView(R.id.news_text1_movie)
@@ -61,10 +62,8 @@ public class MovieFragment extends Fragment {
     List<String> imageList = new ArrayList<>();
     ViewPagerAdapter viewPagerAdapter;
     Unbinder unbinder;
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    MoviePresenter moviePresenter;
 
-    @Inject
-    Api api;
 
     private FragmentActivity myContext;
 
@@ -91,12 +90,6 @@ public class MovieFragment extends Fragment {
         id = getArguments().getInt("id");
     }
 
-    private Observable<MoviePOJO> getMovie(){
-
-        return api.getMovie(id);
-    }
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -106,21 +99,11 @@ public class MovieFragment extends Fragment {
         App.getAppComponent().inject(this);
 
 
-
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
         viewPager.setAdapter(viewPagerAdapter);
 
-
-
-        compositeDisposable.add(
-                getMovie()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::setLayoutInformation, throwable -> {
-                            throwable.printStackTrace();
-                            Toast.makeText(getActivity(),"Error! id =" + id, Toast.LENGTH_SHORT).show();
-                        }));
-
+        moviePresenter = new MoviePresenter(this);
+        moviePresenter.loadData(id);
 
 
         return view;
@@ -170,9 +153,14 @@ public class MovieFragment extends Fragment {
     }
 
     @Override
+    public void setData(MoviePOJO moviePOJO) {
+        setLayoutInformation(moviePOJO);
+    }
+
+    @Override
     public void onDestroy() {
 
-        compositeDisposable.dispose();
+        moviePresenter.destroy();
         super.onDestroy();
     }
 
@@ -182,4 +170,6 @@ public class MovieFragment extends Fragment {
         unbinder.unbind();
         super.onDestroyView();
     }
+
+
 }
