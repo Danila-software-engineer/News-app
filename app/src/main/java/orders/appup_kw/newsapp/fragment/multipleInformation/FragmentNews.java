@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -49,6 +50,12 @@ public class FragmentNews extends BaseFragment implements NewsContract {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        newsAdapter = new NewsAdapter(getContext(), newsStrings);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
@@ -56,7 +63,7 @@ public class FragmentNews extends BaseFragment implements NewsContract {
         updateActivityTitle(getString(R.string.news));
 
 
-        newsAdapter = new NewsAdapter(getContext(), newsStrings);
+
         myRecyclerView.setAdapter(newsAdapter);
 
         newsPresenter = new NewsPresenter(this);
@@ -88,13 +95,13 @@ public class FragmentNews extends BaseFragment implements NewsContract {
 
     @Override
     public void onDestroy() {
-        newsPresenter.destroy();
         super.onDestroy();
     }
 
     @Override
     public void onDestroyView() {
         unbinder.unbind();
+        newsPresenter.destroy();
         super.onDestroyView();
     }
 }

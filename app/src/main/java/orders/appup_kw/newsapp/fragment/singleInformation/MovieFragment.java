@@ -37,13 +37,14 @@ import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
 import orders.appup_kw.newsapp.contract.MoviesContract;
 import orders.appup_kw.newsapp.contract.single_contract.MovieContract;
+import orders.appup_kw.newsapp.fragment.BaseFragment;
 import orders.appup_kw.newsapp.model.MoviePOJO;
 import orders.appup_kw.newsapp.model.NewPOJO;
 import orders.appup_kw.newsapp.network.Api;
 import orders.appup_kw.newsapp.presenter.single_presenter.MoviePresenter;
 
 
-public class MovieFragment extends Fragment implements MovieContract {
+public class MovieFragment extends BaseFragment implements MovieContract {
 
     private int id = 0;
     @BindView(R.id.news_text1_movie)
@@ -97,7 +98,7 @@ public class MovieFragment extends Fragment implements MovieContract {
         unbinder = ButterKnife.bind(this, view);
 
         App.getAppComponent().inject(this);
-
+        updateActivityTitle("Фильм");
 
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
         viewPager.setAdapter(viewPagerAdapter);

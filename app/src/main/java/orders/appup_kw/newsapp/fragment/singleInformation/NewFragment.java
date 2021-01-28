@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +77,7 @@ public class NewFragment extends BaseFragment implements NewContract {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("TAGG","Start New Fragment");
         id = getArguments().getInt("id");
     }
 
@@ -93,7 +95,7 @@ public class NewFragment extends BaseFragment implements NewContract {
         unbinder = ButterKnife.bind(this, view);
 
         App.getAppComponent().inject(this);
-        updateActivityTitle(getString(R.string.news));
+        updateActivityTitle("Новость");
 
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
         viewPager.setAdapter(viewPagerAdapter);

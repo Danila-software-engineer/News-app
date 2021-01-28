@@ -32,8 +32,10 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     private List<NewsPOJO.Result> data;
     private Context context;
     private PublishSubject<Integer> publishSubject = PublishSubject.create();
+    private int lastPosition = -1;
 
     public NewsAdapter(Context context, List<NewsPOJO.Result> data) {
+        Log.e("TAGG", "Create adapter");
         this.data = data;
         this.context = context;
     }
@@ -48,7 +50,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.e("TAGG", "text - " + position);
+
         NewsPOJO.Result result = data.get(position);
         holder.textViewNews.setText(result.getTitle());
 
@@ -79,7 +81,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
             publishSubject.onNext(result.getId());
         });
 
-        setScaleAnimation(holder.itemView);
+        setScaleAnimation(holder.itemView, position);
     }
 
     public PublishSubject<Integer> getPublishSubject() {
@@ -87,10 +89,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     }
 
 
-    private void setScaleAnimation(View view) {
-        TranslateAnimation anim = new TranslateAnimation(1000.0f, 0.0f, 0, 0.0f);
-        anim.setDuration(500);
-        view.startAnimation(anim);
+    private void setScaleAnimation(View view, int position) {
+        if (position > lastPosition) {
+            Log.e("TAGG", "start animation " + position);
+            TranslateAnimation anim = new TranslateAnimation(1000.0f, 0.0f, 0, 0.0f);
+            anim.setDuration(500);
+            view.startAnimation(anim);
+            lastPosition = position;
+        }
     }
 
 

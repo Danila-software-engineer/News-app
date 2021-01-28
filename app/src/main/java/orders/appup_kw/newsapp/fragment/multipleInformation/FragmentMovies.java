@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import butterknife.Unbinder;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.activity.MainActivity;
 import orders.appup_kw.newsapp.adaper.MoviesAdapter;
+import orders.appup_kw.newsapp.adaper.NewsAdapter;
 import orders.appup_kw.newsapp.contract.MoviesContract;
 import orders.appup_kw.newsapp.fragment.BaseFragment;
 import orders.appup_kw.newsapp.model.MoviesPOJO;
@@ -44,6 +46,12 @@ public class FragmentMovies extends BaseFragment implements MoviesContract {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        moviesAdapter = new MoviesAdapter(getContext(), movies);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
@@ -51,8 +59,6 @@ public class FragmentMovies extends BaseFragment implements MoviesContract {
         updateActivityTitle(getString(R.string.movies));
 
 
-
-        moviesAdapter = new MoviesAdapter(getContext(), movies);
         myRecyclerView.setAdapter(moviesAdapter);
 
         moviesPresenter = new MoviesPresenter(this);
@@ -76,11 +82,13 @@ public class FragmentMovies extends BaseFragment implements MoviesContract {
         }
     }
 
-    @Override
-    public void onDestroy() {
-        unbinder.unbind();
-        super.onDestroy();
 
+
+    @Override
+    public void onDestroyView() {
+        unbinder.unbind();
+        moviesPresenter.destroy();
+        super.onDestroyView();
     }
 
     public interface ListenerMovies{

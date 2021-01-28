@@ -30,6 +30,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     private List<MoviesPOJO.Result> data;
     private Context context;
     private PublishSubject<Integer> publishSubject = PublishSubject.create();
+    private int lastPosition = -1;
 
     public MoviesAdapter(Context context, List<MoviesPOJO.Result> data) {
         this.data = data;
@@ -77,14 +78,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             publishSubject.onNext(result.getId());
         });
 
-        setScaleAnimation(holder.itemView);
+        setScaleAnimation(holder.itemView, position);
 
     }
 
-    private void setScaleAnimation(View view) {
-        TranslateAnimation anim = new TranslateAnimation(1000.0f, 0.0f, 0, 0.0f);
-        anim.setDuration(500);
-        view.startAnimation(anim);
+    private void setScaleAnimation(View view, int position) {
+        if (position > lastPosition) {
+            TranslateAnimation anim = new TranslateAnimation(1000.0f, 0.0f, 0, 0.0f);
+            anim.setDuration(500);
+            view.startAnimation(anim);
+            lastPosition = position;
+        }
     }
 
     public PublishSubject<Integer> getPublishSubject() {

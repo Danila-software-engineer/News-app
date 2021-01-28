@@ -19,11 +19,12 @@ import orders.appup_kw.newsapp.App;
 import orders.appup_kw.newsapp.R;
 import orders.appup_kw.newsapp.adaper.ViewPagerAdapter;
 import orders.appup_kw.newsapp.contract.single_contract.PlaceContract;
+import orders.appup_kw.newsapp.fragment.BaseFragment;
 import orders.appup_kw.newsapp.model.PlacePOJO;
 import orders.appup_kw.newsapp.presenter.single_presenter.PlacePresenter;
 
 
-public class PlaceFragment extends Fragment implements PlaceContract {
+public class PlaceFragment extends BaseFragment implements PlaceContract {
 
     @BindView(R.id.news_text1_places)
     TextView textViewTitle;
@@ -74,6 +75,7 @@ public class PlaceFragment extends Fragment implements PlaceContract {
         View view = inflater.inflate(R.layout.fragment_place, container, false);
         unbinder = ButterKnife.bind(this, view);
         App.getAppComponent().inject(this);
+        updateActivityTitle("Место");
 
         viewPagerAdapter = new ViewPagerAdapter(myContext.getSupportFragmentManager(), 1, imageList);
         viewPager.setAdapter(viewPagerAdapter);
